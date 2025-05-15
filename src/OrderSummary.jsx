@@ -32,8 +32,8 @@ const OrderSummary= ({cart,setCart}) => {
                                          <tr key={index} className="border-t">
                                             <td className="p-2 border">{item.name}</td>
                                             <td className="p-2 border">{item.quantity}</td>
-                                            <td className="p-2 border">{item.price}₹</td>
-                                            <td className="p-2 border">{item.total}₹</td>
+                                            <td className="p-2 border">₹{item.price}</td>
+                                            <td className="p-2 border">₹{item.total}</td>
                                             <td className="p-2 border text-center">
                                             <FontAwesomeIcon 
                                             icon={faTrash}
@@ -54,7 +54,7 @@ const OrderSummary= ({cart,setCart}) => {
                                 Total Order Amount:&nbsp;
                                 </span>
                                 <span className="text-xl font-bold text-green-700">
-                                {cart.reduce((sum, item) => sum + item.total, 0)}₹
+                                ₹{cart.reduce((sum, item) => sum + item.total, 0)}
                                 </span>
                             </div>
                         </div>
