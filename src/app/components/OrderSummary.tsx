@@ -14,12 +14,12 @@ interface CartItem {
 // Define props for the OrderSummary component
 interface OrderSummaryProps {
   cart: CartItem[];
+  deliveryDate: string;
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   setDeliveryDate: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const OrderSummary: React.FC<OrderSummaryProps> = ({ cart, setCart }) => {
-  const [deliveryDate, setDeliveryDate] = useState<string>("");
+const OrderSummary: React.FC<OrderSummaryProps> = ({ cart,deliveryDate, setCart,setDeliveryDate }) => {
   const [previousRemaining, setPreviousRemaining] = useState<string>("");
   const [discount, setDiscount] = useState<string>("");
   const [amountPaid, setAmountPaid] = useState<string>("");

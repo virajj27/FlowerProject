@@ -231,6 +231,7 @@ const Flower: React.FC = () => {
 
       <OrderSummary
         cart={cart}
+        deliveryDate={deliveryDate}
         setCart={setCart}
         setDeliveryDate={setDeliveryDate}
       />
