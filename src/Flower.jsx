@@ -21,6 +21,7 @@ const Flower = () => {
 
   const customers = [
     { mobile: 9987481238, name: "Atul N Thorat" },
+    { mobile: 7045235938, name: "Atul Navanath Thorat" },
     { mobile: 7977491293, name: "Amol N Thorat" },
     { mobile: 9665525259, name: "Amit A Thorat" },
     { mobile: 9960078709, name: "Atish A Thorat" },
