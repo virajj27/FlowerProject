@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import OrderSummary from "./OrderSummary";
+import axios from "axios";
 
 const Flower = () => {
   const flowers = [
@@ -19,18 +20,6 @@ const Flower = () => {
     { id: 14, name: "Shanka" },
   ];
 
-  const customers = [
-    { mobile: 9987481238, name: "Atul N Thorat" },
-    { mobile: 7977491293, name: "Amol N Thorat" },
-    { mobile: 9665525259, name: "Amit A Thorat" },
-    { mobile: 9960078709, name: "Atish A Thorat" },
-    { mobile: 7709202071, name: "Kunal P Thorat" },
-    { mobile: 9867057131, name: "Vivek M Thorat" },
-    { mobile: 9503367666, name: "Kiran A Thorat" },
-    { mobile: 9730922432, name: "Kishor A Thorat" },
-    { mobile: 9167130742, name: "Shubham D Thorat" },
-  ];
-
   const [selectedFlower, setSelectedFlower] = useState();
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -39,19 +28,49 @@ const Flower = () => {
   const [mobile, setMobile] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1); // New state for keyboard navigation
 
-  const handleMobileChange = (e) => {
+  const handleMobileChange = async (e) => {
     const input = e.target.value;
     setMobile(input);
 
-    // Filter customers based on the input
-    if (input) {
-      const filtered = customers.filter((customer) =>
-        customer.mobile.toString().startsWith(input)
-      );
-      setFilteredCustomers(filtered);
+    if (input?.length >= 4) {
+      try {
+        const response = await axios.get(
+          // `https://shiv-nursery.onrender.com/customers/search`,
+          `http://localhost:3001/customers/search`,
+          {
+            params: {
+              prefix: input,
+              page: 1,
+              limit: 10,
+            },
+          }
+        );
+        setFilteredCustomers(response.data?.customers || []);
+        setHighlightedIndex(-1); // Reset highlighted index
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        setFilteredCustomers([]);
+      }
     } else {
       setFilteredCustomers([]);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (filteredCustomers.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      setHighlightedIndex((prevIndex) =>
+        prevIndex < filteredCustomers.length - 1 ? prevIndex + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      setHighlightedIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : filteredCustomers.length - 1
+      );
+    } else if (e.key === "Enter" && highlightedIndex >= 0) {
+      handleCustomerSelect(filteredCustomers[highlightedIndex]);
     }
   };
 
@@ -59,6 +78,7 @@ const Flower = () => {
     setMobile(customer.mobile);
     setCustomerName(customer.name);
     setFilteredCustomers([]);
+    setHighlightedIndex(-1); // Reset highlighted index
   };
 
   const handleAddToCart = () => {
@@ -122,17 +142,22 @@ const Flower = () => {
             className="w-full border border-gray-300 rounded-lg p-2"
             value={mobile}
             onChange={handleMobileChange}
+            onKeyDown={handleKeyDown} // Add keydown event
             placeholder="Enter mobile number"
           />
           {filteredCustomers.length > 0 && (
             <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg w-full mt-1 max-h-40 overflow-y-auto">
-              {filteredCustomers.map((customer) => (
+              {filteredCustomers.map((customer, index) => (
                 <li
                   key={customer.mobile}
-                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  className={`p-2 cursor-pointer transition-colors duration-200 ${
+                    highlightedIndex === index
+                      ? "bg-blue-100 text-blue-800"
+                      : "hover:bg-blue-100 hover:text-blue-800"
+                  }`}
                   onClick={() => handleCustomerSelect(customer)}
                 >
-                  {customer.mobile} - {customer.name}
+                  {customer.displayName}
                 </li>
               ))}
             </ul>
