@@ -37,8 +37,8 @@ const Flower = () => {
     if (input?.length >= 4) {
       try {
         const response = await axios.get(
-          // `https://shiv-nursery.onrender.com/customers/search`,
-          `http://localhost:3001/customers/search`,
+          `https://shiv-nursery.onrender.com/customers/search`,
+          // `http://localhost:3001/customers/search`,
           {
             params: {
               prefix: input,
