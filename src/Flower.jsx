@@ -26,22 +26,23 @@ const Flower = () => {
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [mobile, setMobile] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [_, setDeliveryDate] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(-1); // New state for keyboard navigation
+  const [dropdownType, setDropdownType] = useState(""); // New state to track dropdown type
 
   const handleMobileChange = async (e) => {
     const input = e.target.value;
     setMobile(input);
+    setDropdownType("mobile"); // Set dropdown type to "mobile"
 
     if (input?.length >= 4) {
       try {
         const response = await axios.get(
-          `https://shiv-nursery.onrender.com/customers/search`,
-          // `http://localhost:3001/customers/search`,
+          `https://shiv-nursery.onrender.com/customers/searchByMobile`,
           {
             params: {
-              prefix: input,
+              mobile: input,
               page: 1,
               limit: 10,
             },
@@ -51,6 +52,34 @@ const Flower = () => {
         setHighlightedIndex(-1); // Reset highlighted index
       } catch (error) {
         console.error("Error fetching customers:", error);
+        setFilteredCustomers([]);
+      }
+    } else {
+      setFilteredCustomers([]);
+    }
+  };
+
+  const handleNameChange = async (e) => {
+    const input = e.target.value;
+    setCustomerName(input);
+    setDropdownType("name"); // Set dropdown type to "name"
+
+    if (input.length > 3) {
+      try {
+        const response = await axios.get(
+          `https://shiv-nursery.onrender.com/customers/searchByName`,
+          {
+            params: {
+              name: input,
+              page: 1,
+              limit: 10,
+            },
+          }
+        );
+        setFilteredCustomers(response.data?.customers || []);
+        setHighlightedIndex(-1); // Reset highlighted index
+      } catch (error) {
+        console.error("Error fetching customers by name:", error);
         setFilteredCustomers([]);
       }
     } else {
@@ -132,7 +161,7 @@ const Flower = () => {
 
       {/* Mobile and Customer Name - Responsive Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Mobile */}
+        {/* Mobile Input */}
         <div className="space-y-2 relative">
           <label className="block text-gray-700">
             Mobile<span className="text-red-500">*</span>
@@ -142,10 +171,10 @@ const Flower = () => {
             className="w-full border border-gray-300 rounded-lg p-2"
             value={mobile}
             onChange={handleMobileChange}
-            onKeyDown={handleKeyDown} // Add keydown event
+            onKeyDown={handleKeyDown}
             placeholder="Enter mobile number"
           />
-          {filteredCustomers.length > 0 && (
+          {dropdownType === "mobile" && filteredCustomers.length > 0 && (
             <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg w-full mt-1 max-h-40 overflow-y-auto">
               {filteredCustomers.map((customer, index) => (
                 <li
@@ -164,8 +193,8 @@ const Flower = () => {
           )}
         </div>
 
-        {/* Customer Name */}
-        <div className="space-y-2">
+        {/* Customer Name Input */}
+        <div className="space-y-2 relative">
           <label className="block text-gray-700">
             Customer Name<span className="text-red-500">*</span>
           </label>
@@ -173,9 +202,27 @@ const Flower = () => {
             type="text"
             className="w-full border border-gray-300 rounded-lg p-2"
             value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
+            onChange={handleNameChange}
+            onKeyDown={handleKeyDown}
             placeholder="Enter customer name"
           />
+          {dropdownType === "name" && filteredCustomers.length > 0 && (
+            <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg w-full mt-1 max-h-40 overflow-y-auto">
+              {filteredCustomers.map((customer, index) => (
+                <li
+                  key={customer.mobile}
+                  className={`p-2 cursor-pointer transition-colors duration-200 ${
+                    highlightedIndex === index
+                      ? "bg-blue-100 text-blue-800"
+                      : "hover:bg-blue-100 hover:text-blue-800"
+                  }`}
+                  onClick={() => handleCustomerSelect(customer)}
+                >
+                  {customer.name} - {customer.mobile}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
