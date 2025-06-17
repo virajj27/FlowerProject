@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { updateform } from "../../../../store/formSlice";
 import { useRouter } from "next/navigation";
 
-const orderDetails:React.FC=()=>{
+const OrderDetails:React.FC=()=>{
 
   const [selectedFlower, setSelectedFlower] = useState<number | "">("");
   const [quantity,setQuantity]=useState<number>(1);
@@ -96,4 +96,4 @@ const orderDetails:React.FC=()=>{
     </div>
 )   
 }
-export default orderDetails;
+export default OrderDetails;
